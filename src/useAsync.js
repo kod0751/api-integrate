@@ -26,7 +26,7 @@ function reducer(state, action) {
 	}
 }
 
-function useAsync(callback, deps = []) {
+function useAsync(callback, deps = [], skip = false) {
 	const [state, dispatch] = useReducer(reducer, {
 		loading: false,
 		data: null,
@@ -44,7 +44,10 @@ function useAsync(callback, deps = []) {
 	}, [callback]);
 
 	useEffect(() => {
-		fetchData();
+		if (skip) {
+			return;
+		}
+		fetchData(); // 상태가 바뀔떄마다 다시 호출
 		// eslint-disable-next-line
 	}, deps);
 

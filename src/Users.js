@@ -1,24 +1,21 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useAsync } from "react-async";
 import User from "./User";
+import { getUsers, useUsersDispatch, useUsersState } from "./UsersContext";
 
-async function getUsers() {
-	const response = await axios.get(
-		"http://jsonplaceholder.typicode.com/users/",
-	);
-	return response.data;
-}
-
-function UsersReducer() {
+function Users() {
 	const [userId, setUserId] = useState(null);
-	const { data: users, error, isLoading, reload, run } = useAsync({
-		deferFn: getUsers, //promisFn - 바로 불러올 떄 , deferFn - 특정 버튼을 눌러 불러오고 싶을 떄(run)
-	});
+	const state = useUsersState();
+	const dispatch = useUsersDispatch();
 
-	if (isLoading) return <div>로딩중...</div>;
+	const { loading, data: users, error } = state.users;
+
+	const fetchData = () => {
+		getUsers(dispatch);
+	};
+
+	if (loading) return <div>로딩중...</div>;
 	if (error) return <div>에러가 발생했습니다.</div>;
-	if (!users) return <button onClick={run}>불러오기</button>;
+	if (!users) return <button onClick={fetchData}>불러오기</button>;
 
 	return (
 		<>
@@ -29,10 +26,10 @@ function UsersReducer() {
 					</li>
 				))}
 			</ul>
-			<button onClick={reload}>다시 불러오기</button>
+			<button onClick={fetchData}>다시 불러오기</button>
 			{userId && <User id={userId} />}
 		</>
 	);
 }
 
-export default UsersReducer;
+export default Users;
